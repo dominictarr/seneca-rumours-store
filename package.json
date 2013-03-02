@@ -1,0 +1,37 @@
+{
+  "name": "seneca-rumours-store",
+  "version": "0.0.0",
+  "description": "Seneca data store plugin for RumoursDB",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dominictarr/seneca-rumours-store"
+  },
+  "keywords": [
+    "seneca",
+    "plugin",
+    "store",
+    "rumours",
+    "scuttlebutt",
+    "json"
+  ],
+  "author": "Dominic Tarr",
+  "license": "MIT",
+  "dependencies": {
+    "underscore": "~1.4.4",
+    "rumours": "~1.8.1",
+    "node-uuid": "~1.4.0",
+    "map-stream": "0.0.2"
+  },
+  "devDependencies": {
+    "seneca": "~0.5.0",
+    "rimraf": "~2.1.4"
+  },
+  "files": [
+    "LICENSE.txt",
+    "README.md",
+    "lib"
+  ]
+}
