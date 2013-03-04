@@ -1,6 +1,6 @@
 {
   "name": "seneca-rumours-store",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Seneca data store plugin for RumoursDB",
   "scripts": {
     "test": "mocha"
