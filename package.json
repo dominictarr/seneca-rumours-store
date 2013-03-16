@@ -21,7 +21,7 @@
   "license": "MIT",
   "dependencies": {
     "underscore": "~1.4.4",
-    "rumours": "~1.8.1",
+    "rumours": "~1.12.0",
     "node-uuid": "~1.4.0",
     "map-stream": "0.0.2"
   },
