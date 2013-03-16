@@ -8,7 +8,6 @@ var Rumours = require('rumours')
 
 module.exports = function(opts, cb) {
   var desc
-
   var rumours = Rumours(opts)
 
   var entmap = {}
@@ -54,7 +53,7 @@ module.exports = function(opts, cb) {
           ]
         })
 
-        rumours.create(base, ['r-value', name, ent.id].join('!'), ent, function (err, obj) {
+        rumours.create(base, ['r-value', ent.id].join('!'), ent, function (err, obj) {
           //weird thing here, I return the object,
           //but it's not the same reference...
           cb(err, obj)
@@ -73,7 +72,7 @@ module.exports = function(opts, cb) {
       var base   = canon.base
       var name   = canon.name
 
-      rumours.read(base, ['r-value', name, ent.id].join('!'), 
+      rumours.read(base, ['r-value', ent.id].join('!'), 
         function (err, obj) {
           cb(err, ent)
         })
@@ -93,22 +92,20 @@ module.exports = function(opts, cb) {
       var list = []
       var q = args.q
 
-      setTimeout(function () {
-        rumours.list(base, 'value')
-          .on('data', function (ent) {
-            if(!ent) return
-            if(!q.all$)
-              for(var p in q) {
-                if( !~p.indexOf('$') && q[p] != ent[p] )
-                  return
-              }
-            
-            list.push(ent)
-          })
-          .on('end', function () {
-            cb(null, list)
-          })
-      }, 500)
+      rumours.list(base, 'r-value', function (err, list) {
+        if(err) return cb(err)
+        list = list.filter(function (e) {
+          if(q.all$) return true
+          for(var p in q) {
+            if( !~p.indexOf('$') && q[p] != e[p] )
+              return false
+          }
+        
+          return true
+        })
+        cb(null, list)
+      })
+  
     },
 
 
@@ -126,40 +123,31 @@ module.exports = function(opts, cb) {
       var ent    = args.ent
       var canon  = ent.canon$({object:true})
       var zone   = canon.zone
-      var base   = canon.base
+      var base   = canon.base// || 'default'
       var name   = canon.name
 
-      setTimeout(function () {
-        rumours.list(base, 'value')
-          .pipe(mapStream(function (ent, next) {
-            if(!ent) return next()
-            var id = ent._id || ent.id
-            if(!ent) return next()
-            if(!q.all$) {
-              for(var p in q) {
-                if( !~p.indexOf('$') && q[p] != ent[p] ) {
-                  return next()
-                }
+      rumours.list(base, 'r-value')
+        .pipe(mapStream(function (ent, next) {
+          if(!ent) return next()
+          var id = ent._id
+          if(!q.all$) {
+            for(var p in q) {
+              if( !~p.indexOf('$') && q[p] != ent[p] ) {
+                return next()
               }
             }
-            console.log('DELETE', base, id)
-            rumours.delete(base, id, function (err, _) {
-              console.log(err, _)
-              rumours.read(base, id, function (err, obj) {
-                console.log('DELETED?', obj)
-                next()
-              })
-            })
-          }))
-          .on('data', function (ent) {
+          }
+
+          rumours.delete(base, ['r-value', ent.id].join('!')
+          , function (err, _) {
+            
             list.push(ent)
+            next()
           })
-          .on('end', function () {
-            setTimeout(function () {
-              cb(null, [], list)
-            }, 500)
-          })
-      }, 500)
+        }))
+        .on('end', function () {
+          cb(null, list)
+        })
     },
 
 
